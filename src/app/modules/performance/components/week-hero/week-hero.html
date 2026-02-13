@@ -1,0 +1,56 @@
+<div
+  class="rounded-2xl border p-6 shadow-lg"
+  [ngClass]="statusContainerClass"
+>
+  <!-- Header -->
+  <div class="text-xs uppercase tracking-wider opacity-60">
+    Semana Atual
+  </div>
+
+  <div class="text-sm opacity-60 mt-1">
+    {{ weekStart }} – {{ weekEnd }}
+  </div>
+
+  <!-- Main KPI -->
+  <div class="mt-4">
+    <div class="text-4xl font-semibold leading-tight">
+      {{ points >= 0 ? '+' : '' }}{{ points }} pts
+    </div>
+
+    <div class="text-lg mt-1 opacity-80">
+      R$ {{ result | number:'1.2-2':'pt-BR' }}
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="mt-6">
+    <div class="flex justify-between text-xs mb-1 opacity-60">
+      <span>Meta: {{ goal }} pts</span>
+      <span>{{ progressPercent }}%</span>
+    </div>
+
+    <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+      <div
+        class="h-full transition-all duration-500"
+        [ngClass]="progressBarClass"
+        [style.width.%]="progressPercent"
+      ></div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="mt-6 border-t border-gray-700 pt-4">
+    <div class="text-sm font-semibold tracking-wide">
+      STATUS: {{ statusLabel }}
+    </div>
+
+    <div class="text-xs mt-1 opacity-70">
+      Proteção:
+      <span
+        [ngClass]="protection ? 'text-green-500' : 'text-red-500'"
+      >
+        {{ protection ? 'ATIVA' : 'INATIVA' }}
+      </span>
+    </div>
+  </div>
+</div>
