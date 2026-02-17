@@ -12,14 +12,18 @@
 
   <section>
     <app-week-hero
-        *ngIf="currentWeek"
-        [points]="currentWeek.points"
-        [result]="currentWeek.result"
-        [goal]="currentWeek.goal"
-        [protection]="currentWeek.protection"
-        [weekStart]="currentWeek.weekStart"
-        [weekEnd]="currentWeek.weekEnd"
-    />
+        *ngIf="currentWeek as week"
+        [week]="week">
+    </app-week-hero>
+
+    <section *ngFor="let month of months">
+        <app-month-summary
+            [weeks]="month.weeks"
+            [monthName]="month.monthName"
+            [monthlyGoal]="8000">
+        </app-month-summary>
+    </section>
+
 
   </section>
 
