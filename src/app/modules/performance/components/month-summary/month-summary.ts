@@ -59,4 +59,9 @@ export class MonthSummary {
 
     return 'text-red-600';
   }
+
+  get totalResult(): number {
+    return this.weeks.reduce((acc, w) => acc + w.result, 0);
+  }
+
 }

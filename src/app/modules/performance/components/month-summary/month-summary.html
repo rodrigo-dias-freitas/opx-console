@@ -17,6 +17,17 @@
     </div>
   </div>
 
+  <!-- Resultado financeiro -->
+  <div class="mb-4">
+    <div class="text-sm opacity-70">Resultado:</div>
+    <div
+      class="text-xl font-semibold"
+      [class.text-green-500]="totalResult >= 0"
+      [class.text-red-500]="totalResult < 0">
+      {{ totalResult | currency:'BRL':'symbol':'1.2-2' }}
+    </div>
+  </div>
+
   <!-- Meta -->
   <div class="mt-6">
     <div class="text-sm text-gray-500">
