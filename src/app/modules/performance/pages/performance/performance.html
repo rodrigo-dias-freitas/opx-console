@@ -16,6 +16,15 @@
         [week]="week">
     </app-week-hero>
 
+    <div *ngIf="bestWeekday">
+
+        <h3>Melhor Dia da Semana</h3>
+
+        <p>{{ getWeekdayName(bestWeekday.weekday) }}</p>
+        <p>Média: {{ bestWeekday.average | number:'1.0-2' }}</p>
+
+    </div>
+
     <div class="my-4" *ngIf="currentMonth as month">
 
         <div class="flex items-center justify-between mb-4">
