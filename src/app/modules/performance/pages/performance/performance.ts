@@ -13,6 +13,13 @@ interface Day {
   points: number;
 }
 
+interface MonthPeriodStats {
+  period: 'INICIO' | 'MEIO' | 'FINAL';
+  total: number;
+  count: number;
+  average: number;
+}
+
 
 @Component({
   selector: 'app-performance',
@@ -26,6 +33,8 @@ export class Performance implements OnInit {
   selectedMonthIndex = 0;
   days: Day[] = [];
   bestWeekday: any;
+  bestMonthPeriod!: MonthPeriodStats;
+
 
 
   constructor(private performanceService: PerformanceService, private analytics: PerformanceAnalyticsService, private http: HttpClient) {}
@@ -156,10 +165,49 @@ export class Performance implements OnInit {
         });
 
         this.bestWeekday = this.getBestWeekday();
+        this.bestMonthPeriod = this.getBestMonthPeriod();
+
 
       });
   }
 
+  getBestMonthPeriod(): MonthPeriodStats {
+
+    const stats: Record<string, { total: number; count: number }> = {
+      INICIO: { total: 0, count: 0 },
+      MEIO: { total: 0, count: 0 },
+      FINAL: { total: 0, count: 0 }
+    };
+
+    this.days.forEach(day => {
+
+      const dayOfMonth = day.date.getDate();
+
+      let period: 'INICIO' | 'MEIO' | 'FINAL';
+
+      if (dayOfMonth <= 10) {
+        period = 'INICIO';
+      } else if (dayOfMonth <= 20) {
+        period = 'MEIO';
+      } else {
+        period = 'FINAL';
+      }
+
+      stats[period].total += day.points;
+      stats[period].count += 1;
+    });
+
+    const result: MonthPeriodStats[] = Object.entries(stats).map(
+      ([period, data]) => ({
+        period: period as 'INICIO' | 'MEIO' | 'FINAL',
+        total: data.total,
+        count: data.count,
+        average: data.count > 0 ? data.total / data.count : 0
+      })
+    );
+
+    return result.sort((a, b) => b.average - a.average)[0];
+  }
 
 
 }
