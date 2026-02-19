@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Week } from '../../../../core/model/week.model/week.model-module';
 
 @Component({
   selector: 'app-week-hero',
@@ -10,35 +9,45 @@ import { Week } from '../../../../core/model/week.model/week.model-module';
 })
 export class WeekHero {
 
-  @Input() week!: Week;
+@Input() points!: number;
+@Input() result!: number;
+@Input() goal!: number;
+@Input() protection!: boolean;
+@Input() weekStart!: string;
+@Input() weekEnd!: string;
 
-  get progressPercent(): number {
-    if (!this.week?.goal) return 0;
+get progressPercent(): number {
+  if (!this.goal) return 0;
+  return Math.min(Math.round((this.points / this.goal) * 100), 100);
+}
 
-    return Math.min(
-      Math.max((this.week.points / this.week.goal) * 100, 0),
-      100
-    );
-  }
+get statusLabel(): string {
+  if (this.points >= this.goal) return 'CONSISTENTE';
+  if (this.points > 0) return 'EM CONSTRUÇÃO';
+  if (this.points < 0 && this.protection) return 'PROTEGIDO';
+  return 'QUEBRA DE DISCIPLINA';
+}
+get statusContainerClass(): string {
+  const base = 'bg-cockpit-card border-cockpit-border';
 
-  get progressBarClass(): string {
-    if (this.progressPercent >= 100)
-      return 'bg-green-500';
+  if (this.points >= this.goal)
+    return `${base} border-green-600`;
 
-    if (this.progressPercent >= 50)
-      return 'bg-blue-500';
+  if (this.points > 0)
+    return `${base} border-blue-600`;
 
-    return 'bg-red-500';
-  }
+  if (this.points < 0 && this.protection)
+    return `${base} border-yellow-600`;
 
-  get statusLabel(): string {
-    if (this.week.points >= this.week.goal)
-      return 'META ATINGIDA';
+  return `${base} border-red-600`;
+}
 
-    if (this.week.points > 0)
-      return 'EM CONSTRUÇÃO';
+get progressBarClass(): string {
+  if (this.points >= this.goal) return 'bg-green-600';
+  if (this.points > 0) return 'bg-blue-600';
+  if (this.points < 0 && this.protection) return 'bg-yellow-600';
+  return 'bg-red-600';
+}
 
-    return 'NEGATIVO';
-  }
 
 }

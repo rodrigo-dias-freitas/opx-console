@@ -1,30 +1,31 @@
 <div
-  class="rounded-2xl p-6 shadow-lg bg-white text-[#333333]"
+  class="rounded-2xl border p-6 shadow-lg"
+  [ngClass]="statusContainerClass"
 >
   <!-- Header -->
-  <div class="text-xs uppercase tracking-wider opacity-80">
+  <div class="text-xs uppercase tracking-wider opacity-60">
     Semana Atual
   </div>
 
   <div class="text-sm opacity-60 mt-1">
-    {{ week.weekStart }} – {{ week.weekEnd }}
+    {{ weekStart }} – {{ weekEnd }}
   </div>
 
   <!-- Main KPI -->
   <div class="mt-4">
     <div class="text-4xl font-semibold leading-tight">
-      {{ week.points >= 0 ? '+' : '' }}{{ week.points }} pts
+      {{ points >= 0 ? '+' : '' }}{{ points }} pts
     </div>
 
     <div class="text-lg mt-1 opacity-80">
-      R$ {{ week.result | number:'1.2-2':'pt-BR' }}
+      R$ {{ result | number:'1.2-2':'pt-BR' }}
     </div>
   </div>
 
   <!-- Progress Bar -->
   <div class="mt-6">
     <div class="flex justify-between text-xs mb-1 opacity-60">
-      <span>Meta: {{ week.goal }} pts</span>
+      <span>Meta: {{ goal }} pts</span>
       <span>{{ progressPercent }}%</span>
     </div>
 
@@ -46,9 +47,9 @@
     <div class="text-xs mt-1 opacity-70">
       Proteção:
       <span
-        [ngClass]="week.protection ? 'text-green-500' : 'text-red-500'"
+        [ngClass]="protection ? 'text-green-500' : 'text-red-500'"
       >
-        {{ week.protection ? 'ATIVA' : 'INATIVA' }}
+        {{ protection ? 'ATIVA' : 'INATIVA' }}
       </span>
     </div>
   </div>
