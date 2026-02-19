@@ -15,38 +15,17 @@ export class Performance implements OnInit {
 
   weeks: Week[] = [];
   months: MonthGroup[] = [];
-  selectedMonthIndex = 0;
 
   constructor(private performanceService: PerformanceService) {}
 
   ngOnInit(): void {
     this.weeks = this.performanceService.getWeeks();
     this.months = this.performanceService.groupByMonth(this.weeks);
-
-    const currentMonthIndex = this.months.findIndex(month => month.weeks.some(w => w.isCurrent));
-
-    this.selectedMonthIndex = currentMonthIndex >= 0 ? currentMonthIndex : 0;
   }
 
   get currentWeek(): Week | undefined {
     return this.weeks.find(w => w.isCurrent);
   }
-
-  get currentMonth(): MonthGroup | undefined {
-    return this.months[this.selectedMonthIndex];
-  }
-  goToPreviousMonth(): void {
-  if (this.selectedMonthIndex > 0) {
-    this.selectedMonthIndex--;
-  }
-}
-
-goToNextMonth(): void {
-  if (this.selectedMonthIndex < this.months.length - 1) {
-    this.selectedMonthIndex++;
-  }
-}
-
 
 
 }
