@@ -69,6 +69,16 @@ export class Performance {
       protection: false,
       weekStart: '09 Fev',
       weekEnd: '13 Fev',
+      isCurrent: false
+    },
+    {
+      id: 7,
+      points: 463.75,
+      result: 341.00,
+      goal: 2500,
+      protection: false,
+      weekStart: '18 Fev',
+      weekEnd: '20 Fev',
       isCurrent: true
     },
   ]
