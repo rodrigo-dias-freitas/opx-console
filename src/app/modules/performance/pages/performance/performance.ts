@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
-import { WeekHero } from '../../components/week-hero/week-hero';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+import { WeekHero } from '../../components/week-hero/week-hero';
+import { MonthSummary } from '../../components/month-summary/month-summary';
 
 @Component({
   selector: 'app-performance',
-  imports: [ CommonModule, WeekHero ],
+  imports: [ CommonModule, WeekHero, MonthSummary ],
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })
@@ -69,6 +71,16 @@ export class Performance {
       protection: false,
       weekStart: '09 Fev',
       weekEnd: '13 Fev',
+      isCurrent: false
+    },
+    {
+      id: 7,
+      points: 463.75,
+      result: 341.00,
+      goal: 2500,
+      protection: false,
+      weekStart: '18 Fev',
+      weekEnd: '20 Fev',
       isCurrent: true
     },
   ]
