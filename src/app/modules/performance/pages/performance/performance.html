@@ -13,13 +13,38 @@
   <section>
     <app-week-hero *ngIf="currentWeek" [week]="currentWeek"  />
   </section>
-  <section *ngFor="let month of monthsGroup">
+  <section>
+    <div *ngIf="currentMonth as month">
 
-    <app-month-summary
-      [weeks]="month.weeks"
-      [monthName]="month.monthName"
-      [monthlyGoal]="8000">
-    </app-month-summary>
+      <div class="flex items-center justify-between mb-4">
+    
+        <button
+          (click)="goToPreviousMonth()"
+          [disabled]="selectedMonthIndex === 0"
+          class="px-3 py-1 bg-gray-700 rounded disabled:opacity-40">
+          ←
+        </button>
+    
+        <h2 class="text-lg font-bold tracking-wide">
+          {{ month.monthName }}
+        </h2>
+    
+        <button
+          (click)="goToNextMonth()"
+          [disabled]="selectedMonthIndex === months.length - 1"
+          class="px-3 py-1 bg-gray-700 rounded disabled:opacity-40">
+          →
+        </button>
+    
+      </div>
+    
+      <app-month-summary
+        [weeks]="month.weeks"
+        [monthName]="month.monthName"
+        [monthlyGoal]="8000">
+      </app-month-summary>
+    
+    </div>
   
   </section>
 

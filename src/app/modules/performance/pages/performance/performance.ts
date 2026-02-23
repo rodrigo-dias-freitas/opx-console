@@ -22,6 +22,7 @@ export class Performance implements OnInit {
 
   weeks: Week[] = [];
   monthsGroup: MonthGroup[] = []
+  selectedMonthIndex = 0;
 
   constructor(private performanceService: PerformanceService) {}
 
@@ -81,6 +82,22 @@ export class Performance implements OnInit {
     ];
   
     return months[monthIndex];
+  }
+
+  get currentMonth(): MonthGroup | undefined {
+    return this.months[this.selectedMonthIndex];
+  }
+
+  goToPreviousMonth(): void {
+    if (this.selectedMonthIndex > 0) {
+      this.selectedMonthIndex--;
+    }
+  }
+  
+  goToNextMonth(): void {
+    if (this.selectedMonthIndex < this.months.length - 1) {
+      this.selectedMonthIndex++;
+    }
   }
 
 }
