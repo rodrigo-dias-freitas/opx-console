@@ -21,14 +21,16 @@ interface Week {
 export class MonthSummary {
 
   @Input() weeks: Week[] = [];
-  @Input() monthName: string = '';
-  @Input() monthlyGoal: number = 2000;
+  @Input() monthName!: string;
+  @Input() monthlyGoal!: number;
 
   get totalPoints(): number {
     return this.weeks.reduce((acc, w) => acc + w.points, 0);
   }
 
   get progressPercent(): number {
+    if (!this.monthlyGoal) return 0;
+
     return Math.min(
       Math.max((this.totalPoints / this.monthlyGoal) * 100, 0),
       100

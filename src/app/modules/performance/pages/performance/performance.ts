@@ -1,8 +1,16 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { WeekHero } from '../../components/week-hero/week-hero';
 import { MonthSummary } from '../../components/month-summary/month-summary';
+import { Week } from '../../../../core/model/week';
+import { PerformanceService } from '../../services/performance.service';
+
+interface MonthGroup {
+  monthIndex: number;
+  monthName: string;
+  weeks: Week[];
+}
 
 @Component({
   selector: 'app-performance',
@@ -10,84 +18,69 @@ import { MonthSummary } from '../../components/month-summary/month-summary';
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })
-export class Performance {
+export class Performance implements OnInit {
 
-  weeks = [
-    {
-      id: 1,
-      points: 440,
-      result: 529.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '05 Jan',
-      weekEnd: '09 Jan',
-      isCurrent: false
-    },
-    {
-      id: 2,
-      points: 596.25,
-      result: 477.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '12 Jan',
-      weekEnd: '16 Jan',
-      isCurrent: false
-    },
-    {
-      id: 3,
-      points: 6996.25,
-      result: 5597.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '19 Jan',
-      weekEnd: '23 Jan',
-      isCurrent: false
-    },
-    {
-      id: 4,
-      points: -1575,
-      result: -1260.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '26 Jan',
-      weekEnd: '30 Jan',
-      isCurrent: false
-    },
-    {
-      id: 5,
-      points: 2730,
-      result: 2184.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '02 Fev',
-      weekEnd: '06 Fev',
-      isCurrent: false
-    },
-    {
-      id: 6,
-      points: 2525,
-      result: 2020.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '09 Fev',
-      weekEnd: '13 Fev',
-      isCurrent: false
-    },
-    {
-      id: 7,
-      points: 463.75,
-      result: 341.00,
-      goal: 2500,
-      protection: false,
-      weekStart: '18 Fev',
-      weekEnd: '20 Fev',
-      isCurrent: true
-    },
-  ]
+  weeks: Week[] = [];
+  monthsGroup: MonthGroup[] = []
 
+  constructor(private performanceService: PerformanceService) {}
 
-  get currentWeek() {
+  ngOnInit(): void {
+    this.weeks = this.performanceService.getWeeks();
+    this.monthsGroup = this.performanceService.groupByMonth(this.weeks);
+  }
+
+  get currentWeek(): Week | undefined {
     return this.weeks.find(w => w.isCurrent);
+  }
+
+  getWeeksByMonth(month: number) {
+    return this.weeks.filter(w => {
+      const date = new Date(w.weekStart);
+      return date.getMonth() === month;
+    });
+  }
+
+  get months(): MonthGroup[] {
+    const map = new Map<number, Week[]>();
+  
+    for (const week of this.weeks) {
+      const date = new Date(week.weekStart);
+      const month = date.getMonth();
+  
+      if (!map.has(month)) {
+        map.set(month, []);
+      }
+  
+      map.get(month)!.push(week);
+    }
+  
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([monthIndex, weeks]) => ({
+        monthIndex,
+        monthName: this.getMonthName(monthIndex),
+        weeks
+      }));
+  }
+
+  getMonthName(monthIndex: number): string {
+    const months = [
+      'JANEIRO',
+      'FEVEREIRO',
+      'MARÇO',
+      'ABRIL',
+      'MAIO',
+      'JUNHO',
+      'JULHO',
+      'AGOSTO',
+      'SETEMBRO',
+      'OUTUBRO',
+      'NOVEMBRO',
+      'DEZEMBRO'
+    ];
+  
+    return months[monthIndex];
   }
 
 }
