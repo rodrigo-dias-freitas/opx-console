@@ -5,16 +5,23 @@
       {{ monthName }}
     </div>
   
-    <!-- Total -->
-    <div class="mt-4">
-      <div class="text-sm text-gray-500">
-        Total acumulado:
-      </div>
-  
-      <div class="text-3xl font-semibold"
-           [ngClass]="totalPoints >= 0 ? 'text-green-600' : 'text-red-600'">
-        {{ totalPoints >= 0 ? '+' : '' }}{{ totalPoints }} pts
-      </div>
+    <!-- Total acumulado (points) -->
+    <div class="mb-2">
+        <div class="text-sm text-gray-500">Total acumulado:</div>
+        <div class="text-2xl font-bold text-gray-700">
+        {{ totalPoints | number:'1.0-2' }} pts
+        </div>
+    </div>
+
+    <!-- Resultado financeiro -->
+    <div class="mb-4">
+        <div class="text-sm text-gray-500">Resultado:</div>
+        <div
+        class="text-xl font-semibold"
+        [class.text-green-500]="totalResult >= 0"
+        [class.text-red-500]="totalResult < 0">
+        {{ totalResult | currency:'BRL':'symbol':'1.2-2' }}
+        </div>
     </div>
   
     <!-- Meta -->

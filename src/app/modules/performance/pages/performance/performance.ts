@@ -29,6 +29,12 @@ export class Performance implements OnInit {
   ngOnInit(): void {
     this.weeks = this.performanceService.getWeeks();
     this.monthsGroup = this.performanceService.groupByMonth(this.weeks);
+
+    const currentMonthIndex = this.months.findIndex(month => 
+      month.weeks.some(w => w.isCurrent)
+    );
+
+    this.selectedMonthIndex = currentMonthIndex >= 0 ? currentMonthIndex : 0;
   }
 
   get currentWeek(): Week | undefined {
