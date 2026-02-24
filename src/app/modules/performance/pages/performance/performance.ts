@@ -16,11 +16,13 @@ interface MonthGroup {
 interface Day {
   date: Date;
   points: number;
+  result: number;
 }
 
 @Component({
   selector: 'app-performance',
-  imports: [ CommonModule, WeekHero, MonthSummary ],
+  standalone: true,
+  imports: [ CommonModule, MonthSummary ],
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })
@@ -31,24 +33,14 @@ export class Performance implements OnInit {
   selectedMonthIndex = 0;
   days: Day[] = [];
   bestWeekday: any;
+  currentWeek?: Week;
 
   constructor(private performanceService: PerformanceService, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.weeks = this.performanceService.getWeeks();
-    this.monthsGroup = this.performanceService.groupByMonth(this.weeks);
     this.loadCsv();
-
-    const currentMonthIndex = this.months.findIndex(month => 
-      month.weeks.some(w => w.isCurrent)
-    );
-
-    this.selectedMonthIndex = currentMonthIndex >= 0 ? currentMonthIndex : 0;
   }
 
-  get currentWeek(): Week | undefined {
-    return this.weeks.find(w => w.isCurrent);
-  }
 
   getWeeksByMonth(month: number) {
     return this.weeks.filter(w => {
@@ -145,47 +137,69 @@ export class Performance implements OnInit {
 
         const dataLines = lines.slice(startIndex + 1);
 
-        const dailyMap = new Map<string, number>();
+        const dailyMap = new Map<string, {
+          totalResult: number;
+          totalPoints: number;
+        }>();
 
         dataLines.forEach(line => {
 
           if (!line.trim()) return;
 
           const parts = line.split(';');
+          if (parts.length < 15) return; // agora precisa de 15 colunas
 
-          if (parts.length < 14) return;
+          const fechamento = parts[2].trim();
 
-          const fechamento = parts[2].trim(); // 02/01/2025 09:11:33
-          const resultado = parts[13].trim(); // -110,00
+          const resultStr = parts[13].trim();  // financeiro
+          const pointsStr = parts[14].trim();  // percentual
 
-          const date = fechamento.split(' ')[0]; // 02/01/2025
+          const date = fechamento.split(' ')[0];
 
-          const value = Number(
-            resultado
+          const resultValue = Number(
+            resultStr
+              .replace('.', '')
+              .replace(',', '.')
+          );
+
+          const pointsValue = Number(
+            pointsStr
               .replace('.', '')
               .replace(',', '.')
           );
 
           if (!dailyMap.has(date)) {
-            dailyMap.set(date, 0);
+            dailyMap.set(date, { totalResult: 0, totalPoints: 0 });
           }
 
-          dailyMap.set(date, dailyMap.get(date)! + value);
+          const current = dailyMap.get(date)!;
+
+          current.totalResult += resultValue;
+          current.totalPoints += pointsValue;
         });
 
-        this.days = Array.from(dailyMap.entries()).map(([date, points]) => {
+        this.days = Array.from(dailyMap.entries()).map(([date, data]) => {
 
           const [day, month, year] = date.split('/');
 
           return {
             date: new Date(+year, +month - 1, +day),
-            points
+            points: data.totalPoints,   
+            result: data.totalResult    
           };
         });
 
         this.bestWeekday = this.getBestWeekday();
+        this.rebuildWeeks();
+        this.calculateAnalytics();
+        
+        this.selectedMonthIndex = this.months.length - 1;
+
+        console.log('SELECTED INDEX:', this.selectedMonthIndex);
+        console.log('SELECTED MONTH:', this.months[this.selectedMonthIndex]);
 
       });
+
   }
 
   getBestWeekday() {
@@ -215,4 +229,93 @@ export class Performance implements OnInit {
     return averages[0];
   }
 
+ 
+
+  private getWeekNumber(date: Date): number {
+
+    const tempDate = new Date(date.getTime());
+
+    // Ajusta para quinta-feira da mesma semana (ISO 8601)
+    tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+
+    const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+
+    const weekNumber = Math.ceil(
+      (((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7
+    );
+
+    return weekNumber;
+  }
+
+  private calculateAnalytics(): void {
+    this.rebuildWeeks();
+    this.bestWeekday = this.getBestWeekday();
+    this.currentWeek = this.weeks.find(w => w.isCurrent);
+  }
+
+
+  private rebuildWeeks(): void {
+
+    const today = new Date();
+    const currentWeekNumber = this.getWeekNumber(today);
+    const currentYear = today.getFullYear();
+
+    const map = new Map<string, {
+      totalPoints: number;
+      totalResult: number;
+      start: Date;
+      end: Date;
+    }>();
+
+    this.days.forEach(day => {
+
+      const year = day.date.getFullYear();
+      const weekNumber = this.getWeekNumber(day.date);
+      const key = `${year}-W${weekNumber}`;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          totalPoints: 0,
+          totalResult: 0,
+          start: day.date,
+          end: day.date
+        });
+      }
+
+      const current = map.get(key)!;
+
+      current.totalPoints += day.points;
+      current.totalResult += day.result;
+
+      if (day.date < current.start) current.start = day.date;
+      if (day.date > current.end) current.end = day.date;
+    });
+
+    this.weeks = Array.from(map.entries())
+      .map(([_, data], index) => {
+
+        const weekYear = data.start.getFullYear();
+        const weekNumber = this.getWeekNumber(data.start);
+
+        return {
+          id: index,
+          points: data.totalPoints,
+          result: data.totalResult,
+          goal: 2500,
+          protection: data.totalPoints > 0,
+          weekStart: data.start.toISOString().split('T')[0],
+          weekEnd: data.end.toISOString().split('T')[0],
+          isCurrent:
+            weekYear === currentYear &&
+            weekNumber === currentWeekNumber
+        };
+      })
+      .sort((a, b) =>
+        new Date(a.weekStart).getTime() -
+        new Date(b.weekStart).getTime()
+      );
+      console.log('Weeks with isCurrent true:', this.weeks.filter(w => w.isCurrent));
+  }
+  
+  
 }

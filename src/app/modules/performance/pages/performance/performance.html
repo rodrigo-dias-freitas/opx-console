@@ -11,7 +11,13 @@
   </header>
 
   <section>
-    <app-week-hero *ngIf="currentWeek" [week]="currentWeek"  />
+    <!--<app-week-hero *ngIf="currentWeek" [week]="currentWeek"  />-->
+    <section>
+      <div *ngIf="currentWeek">
+        Week ID: {{ currentWeek.id }}
+        Points: {{ currentWeek.points }}
+      </div>
+    </section>
   </section>
   <section>
     <div *ngIf="currentMonth as month">

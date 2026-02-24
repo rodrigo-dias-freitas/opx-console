@@ -5,13 +5,14 @@ import { Week } from '../../../../core/model/week';
 
 @Component({
   selector: 'app-week-hero',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './week-hero.html',
   styleUrl: './week-hero.css',
 })
 export class WeekHero {
 
-@Input() week!: Week;
+@Input() week?: Week;
 
 get progressPercent(): number {
   if (!this.week?.goal) return 0;
