@@ -22,7 +22,7 @@ interface Day {
 @Component({
   selector: 'app-performance',
   standalone: true,
-  imports: [ CommonModule, MonthSummary ],
+  imports: [ CommonModule, MonthSummary, WeekHero ],
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })
