@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
 
 import { WeekHero } from '../../components/week-hero/week-hero';
 import { MonthSummary } from '../../components/month-summary/month-summary';
@@ -37,7 +38,7 @@ export class Performance implements OnInit {
   currentWeek?: Week;
   months: MonthGroup[] = [];
 
-  constructor(private performanceService: PerformanceService, private http: HttpClient) {}
+  constructor(private performanceService: PerformanceService, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadCsv();
@@ -166,6 +167,7 @@ export class Performance implements OnInit {
 
         const lines = data.split('\n');
 
+
         // Encontrar onde começa a tabela
         const startIndex = lines.findIndex(line =>
           line.startsWith('Ativo;')
@@ -228,16 +230,9 @@ export class Performance implements OnInit {
         this.bestWeekday = this.getBestWeekday();
         this.rebuildWeeks();
         this.calculateAnalytics();
+        this.cdr.detectChanges();
         
         this.selectedMonthIndex = this.months.length - 1;
-
-        console.log('SELECTED INDEX:', this.selectedMonthIndex);
-        console.log('SELECTED MONTH:', this.months[this.selectedMonthIndex]);
-
-        console.log('Final state');
-      console.log('weeks: ', this.weeks.length);
-      console.log('months: ', this.months.length);
-        console.log('current week: ', this.currentWeek);
 
       });
       

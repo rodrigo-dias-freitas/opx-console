@@ -10,6 +10,7 @@
     </p>
   </header>
 
+
   <section  *ngIf="currentWeek as week">
     <app-week-hero [week]="week"></app-week-hero>
   </section>
@@ -53,10 +54,6 @@
 
       <h3>Melhor Dia da Semana</h3>
       <p>{{ getWeekdayName(bestWeekday.weekday) }}</p>
-
-      <p>
-        Média: {{ bestWeekday.average | number:'1.0-2' }}
-      </p>
 
     </div>
   </section>
