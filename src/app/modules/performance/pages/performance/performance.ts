@@ -8,6 +8,7 @@ import { Week } from '../../../../core/model/week';
 import { PerformanceService } from '../../services/performance.service';
 
 interface MonthGroup {
+  year: number;
   monthIndex: number;
   monthName: string;
   weeks: Week[];
@@ -34,6 +35,7 @@ export class Performance implements OnInit {
   days: Day[] = [];
   bestWeekday: any;
   currentWeek?: Week;
+  months: MonthGroup[] = [];
 
   constructor(private performanceService: PerformanceService, private http: HttpClient) {}
 
@@ -49,7 +51,7 @@ export class Performance implements OnInit {
     });
   }
 
-  get months(): MonthGroup[] {
+  /*get months(): MonthGroup[] {
     const map = new Map<number, Week[]>();
   
     for (const week of this.weeks) {
@@ -70,8 +72,42 @@ export class Performance implements OnInit {
         monthName: this.getMonthName(monthIndex),
         weeks
       }));
-  }
+  }*/
 
+  private buildMonths():void {
+    const map = new Map<string, Week[]>();
+
+    for(const week of this.weeks){
+      const date = new Date(week.weekStart);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+
+      const key = `${year}-${month}`;
+
+      if(!map.has(key)) {
+        map.set(key, []);
+      }
+
+      map.get(key)?.push(week);
+    }
+
+    this.months = Array.from(map.entries())
+      .sort(([a], [b]) => {
+        const [yearA, monthA] = a.split('-').map(Number);
+        const [yearB, monthB] = b.split('-').map(Number);
+
+        const dateA = new Date(yearA, monthA);
+        const dateB = new Date(yearB, monthB);
+
+        return dateA.getTime() - dateB.getTime();
+      })
+      .map(([key, weeks]) => { 
+        const [year, monthIndex] = key.split('-').map(Number) as [number, number];
+
+        return{ monthIndex, year, monthName: this.getMonthName(monthIndex), weeks}
+      });
+  }
+  
   getMonthName(monthIndex: number): string {
     const months = [
       'JANEIRO',
@@ -198,8 +234,13 @@ export class Performance implements OnInit {
         console.log('SELECTED INDEX:', this.selectedMonthIndex);
         console.log('SELECTED MONTH:', this.months[this.selectedMonthIndex]);
 
-      });
+        console.log('Final state');
+      console.log('weeks: ', this.weeks.length);
+      console.log('months: ', this.months.length);
+        console.log('current week: ', this.currentWeek);
 
+      });
+      
   }
 
   getBestWeekday() {
@@ -249,8 +290,16 @@ export class Performance implements OnInit {
 
   private calculateAnalytics(): void {
     this.rebuildWeeks();
-    this.bestWeekday = this.getBestWeekday();
+    this.buildMonths();
+    
     this.currentWeek = this.weeks.find(w => w.isCurrent);
+    this.bestWeekday = this.getBestWeekday();
+
+    if(this.currentWeek) {
+      const currentMonth = new Date(this.currentWeek.weekStart).getMonth();
+      this.selectedMonthIndex = this.months.findIndex(m => m.monthIndex === currentMonth);
+    }
+
   }
 
 
