@@ -1,64 +1,74 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface Week {
-  id: number;
-  points: number;
-  result: number;
-  goal: number;
-  protection: boolean;
-  weekStart: string;
-  weekEnd: string;
-  isCurrent: boolean;
+// Interface para garantir que o TypeScript entenda a estrutura das semanas
+export interface WeeklyData {
+  totalResult: number;
+  totalPoints: number;
+  label?: string;
 }
 
 @Component({
   selector: 'app-month-summary',
+  standalone: true,
   imports: [ CommonModule ],
   templateUrl: './month-summary.html',
-  styleUrl: './month-summary.css',
+  styleUrls: ['./month-summary.css']
 })
-export class MonthSummary {
+export class MonthSummaryComponent implements OnChanges {
+  // Entradas vindas do componente pai (Dashboard)
+  @Input() weeks: any[] = [];
+  @Input() monthName: string = '';
+  @Input() monthlyGoal: number = 8000;
 
-  @Input() weeks: Week[] = [];
-  @Input() monthName!: string;
-  @Input() monthlyGoal!: number;
+  // Propriedades calculadas para o HTML
+  totalResult: number = 0;
+  totalPoints: number = 0;
+  progressPercentage: number = 0;
+  remainingToGoal: number = 0;
+  isGoalAchieved: boolean = false;
 
-  get totalPoints(): number {
-    return this.weeks.reduce((acc, w) => acc + w.points, 0);
+  constructor() {}
+
+  // O ngOnChanges dispara sempre que @Input() weeks ou @Input() monthlyGoal mudar
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['weeks'] || changes['monthlyGoal']) {
+      this.calculateMonthlyPerformance();
+    }
   }
 
-  get progressPercent(): number {
-    if (!this.monthlyGoal) return 0;
+  private calculateMonthlyPerformance() {
+    if (!this.weeks || this.weeks.length === 0) {
+      console.warn('OPX: Nenhuma semana recebida no MonthSummary');
+      this.resetStats();
+      return;
+    }
 
-    return Math.min(
-      Math.max((this.totalPoints / this.monthlyGoal) * 100, 0),
-      100
-    );
+    // LOG DE DEBUG: Abra o console (F12) e veja o nome das propriedades aqui
+    console.log('Dados recebidos no componente:', this.weeks[0]);
+
+    // Tente somar usando os nomes mais comuns (result ou totalResult)
+    // O operador '||' garante que se um for undefined, ele tenta o outro ou usa 0
+    this.totalResult = this.weeks.reduce((acc, week) => {
+      const val = week.result ?? week.totalResult ?? 0;
+      return acc + val;
+    }, 0);
+
+    this.totalPoints = this.weeks.reduce((acc, week) => {
+      const pts = week.points ?? week.totalPoints ?? 0;
+      return acc + pts;
+    }, 0);
+    
+    const rawProgress = (this.totalResult / this.monthlyGoal) * 100;
+    this.progressPercentage = Math.max(0, Math.min(rawProgress, 100));
+    this.remainingToGoal = this.monthlyGoal - this.totalResult;
   }
 
-  get weeklyAverage(): number {
-    if (!this.weeks.length) return 0;
-    return this.totalPoints / this.weeks.length;
-  }
-
-  get statusLabel(): string {
-    if (this.totalPoints >= this.monthlyGoal) return 'META ATINGIDA';
-    if (this.totalPoints > 0) return 'EM CONSTRUÇÃO';
-    return 'NEGATIVO';
-  }
-
-  get statusClass(): string {
-    if (this.totalPoints >= this.monthlyGoal)
-      return 'text-green-600';
-
-    if (this.totalPoints > 0)
-      return 'text-blue-600';
-
-    return 'text-red-600';
-  }
-
-  get totalResult(): number {
-    return this.weeks.reduce((acc, w) => acc + w.result, 0);
+  private resetStats() {
+    this.totalResult = 0;
+    this.totalPoints = 0;
+    this.progressPercentage = 0;
+    this.remainingToGoal = this.monthlyGoal;
+    this.isGoalAchieved = false;
   }
 }

@@ -14,41 +14,40 @@
   <section  *ngIf="currentWeek as week">
     <app-week-hero [week]="week"></app-week-hero>
   </section>
-  <section>
-    <div *ngIf="currentMonth as month">
+  <section class="mt-8">
+  <div *ngIf="currentMonth as month">
 
-      <div class="flex items-center justify-between mb-4">
-    
-        <button
-          (click)="goToPreviousMonth()"
-          [disabled]="selectedMonthIndex === 0"
-          class="px-3 py-1 bg-gray-700 rounded disabled:opacity-40">
-          ←
-        </button>
-    
-        <h2 class="text-lg font-bold tracking-wide">
+    <div class="flex items-center justify-between mb-6">
+      <button
+        (click)="goToPreviousMonth()"
+        [disabled]="selectedMonthIndex === 0"
+        class="px-4 py-2 bg-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-700 transition-colors">
+        ←
+      </button>
+
+      <div class="text-center">
+        <h2 class="text-xl font-black uppercase tracking-widest text-white">
           {{ month.monthName }}
         </h2>
-    
-        <button
-          (click)="goToNextMonth()"
-          [disabled]="selectedMonthIndex === months.length - 1"
-          class="px-3 py-1 bg-gray-700 rounded disabled:opacity-40">
-          →
-        </button>
-    
+        <span class="text-[10px] text-blue-400 font-bold uppercase">Relatório de Performance</span>
       </div>
-    
-      <app-month-summary
-        [weeks]="month.weeks"
-        [monthName]="month.monthName"
-        [monthlyGoal]="8000">
-      </app-month-summary>
-    
-    </div>
-  
-  </section>
 
+      <button
+        (click)="goToNextMonth()"
+        [disabled]="selectedMonthIndex === months.length - 1"
+        class="px-4 py-2 bg-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-700 transition-colors">
+        →
+      </button>
+    </div>
+
+    <app-month-summary
+      [weeks]="month.weeks"
+      [monthName]="month.monthName"
+      [monthlyGoal]="8000">
+    </app-month-summary>
+
+  </div>
+</section>
   <section *ngIf="days.length > 0">
     <app-best-weekday [days]="days"></app-best-weekday>
   </section>

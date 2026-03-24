@@ -1,70 +1,73 @@
-<div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+<div class="bg-gray-800/40 border border-white/5 rounded-2xl p-6 backdrop-blur-sm">
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="flex flex-col">
+      <span class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Resultado Acumulado</span>
+      <span [ngClass]="totalResult >= 0 ? 'text-green-400' : 'text-red-400'" class="text-3xl font-black">
+        {{ totalResult | currency:'BRL' }}
+      </span>
+    </div>
+    
+    <div class="flex flex-col">
+      <span class="text-xs text-neutral-400 uppercase tracking-widest mb-1">Pontuação Total</span>
+      <span class="text-3xl font-black text-white">
+        {{ totalPoints | number }} <small class="text-sm font-normal text-neutral-500">pts</small>
+      </span>
+    </div>
 
-    <!-- Título -->
-    <div class="text-xs uppercase tracking-wider text-gray-500">
-      {{ monthName }}
-    </div>
-  
-    <!-- Total acumulado (points) -->
-    <div class="mb-2">
-        <div class="text-sm text-gray-500">Total acumulado:</div>
-        <div class="text-2xl font-bold text-gray-700">
-        {{ totalPoints | number:'1.0-2' }} pts
-        </div>
-    </div>
-
-    <!-- Resultado financeiro -->
-    <div class="mb-4">
-        <div class="text-sm text-gray-500">Resultado:</div>
-        <div
-        class="text-xl font-semibold"
-        [class.text-green-500]="totalResult >= 0"
-        [class.text-red-500]="totalResult < 0">
-        {{ totalResult | currency:'BRL':'symbol':'1.2-2' }}
-        </div>
-    </div>
-  
-    <!-- Meta -->
-    <div class="mt-6">
-      <div class="text-sm text-gray-500">
-        Meta mensal:
+    <div class="flex flex-col justify-center">
+      <div class="flex justify-between text-xs mb-2">
+        <span class="text-neutral-400">Progresso da Meta ({{ monthlyGoal | currency:'BRL' }})</span>
+        <span class="text-white font-bold">{{ progressPercentage | number:'1.0-0' }}%</span>
       </div>
-  
-      <div class="text-lg font-medium text-gray-800">
-        {{ monthlyGoal }} pts ({{ progressPercent | number:'1.0-0' }}%)
-      </div>
-  
-      <!-- Barra -->
-      <div class="mt-2 w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          class="h-full transition-all duration-500"
-          [ngClass]="totalPoints >= monthlyGoal ? 'bg-green-500' : 'bg-blue-500'"
-          [style.width.%]="progressPercent">
+      <div class="w-full bg-gray-700 rounded-full h-2.5">
+        <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" 
+             [style.width.%]="progressPercentage"
+             [ngClass]="{'bg-green-500': progressPercentage >= 100, 'bg-yellow-500': progressPercentage > 50 && progressPercentage < 100}">
         </div>
       </div>
     </div>
-  
-    <!-- Média -->
-    <div class="mt-6">
-      <div class="text-sm text-gray-500">
-        Média semanal:
-      </div>
-  
-      <div class="text-lg font-medium text-gray-800">
-        {{ weeklyAverage | number:'1.0-0' }} pts
-      </div>
-    </div>
-  
-    <!-- Status -->
-    <div class="mt-6 border-t pt-4 border-gray-200">
-      <div class="text-sm font-semibold tracking-wide">
-        STATUS MENSAL:
-      </div>
-  
-      <div class="text-sm mt-1 font-medium"
-           [ngClass]="statusClass">
-        {{ statusLabel }}
-      </div>
-    </div>
-  
   </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-separate border-spacing-y-2">
+      <thead>
+        <tr class="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <th class="px-4 py-2">Semana</th>
+          <th class="px-4 py-2 text-right">Pontos</th>
+          <th class="px-4 py-2 text-right">Resultado</th>
+          <th class="px-4 py-2 text-center">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let week of weeks; let i = index" class="...">
+          <td class="...">Semana {{ i + 1 }}</td>
+          
+          <td class="text-right font-mono">
+            {{ (week.points ?? week.totalPoints) | number }}
+          </td>
+          
+          <td class="text-right font-bold" 
+              [ngClass]="(week.result ?? week.totalResult) >= 0 ? 'text-green-400' : 'text-red-400'">
+            {{ (week.result ?? week.totalResult) | currency:'BRL' }}
+          </td>
+          
+          <td class="text-center">
+            <span *ngIf="(week.result ?? week.totalResult) > 0" class="...">Gain</span>
+            <span *ngIf="(week.result ?? week.totalResult) <= 0" class="...">Loss</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-6 pt-6 border-t border-white/5 flex justify-between items-center text-xs">
+    <span class="text-neutral-500">Sistema Freitas de Leitura Integrada (SFLIM)</span>
+    <span class="text-neutral-400" *ngIf="remainingToGoal > 0">
+      Faltam <b class="text-white">{{ remainingToGoal | currency:'BRL' }}</b> para atingir a meta.
+    </span>
+    <span class="text-green-400 font-bold" *ngIf="remainingToGoal <= 0">
+      Meta Batida! 🚀
+    </span>
+  </div>
+</div>
