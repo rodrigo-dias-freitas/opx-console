@@ -3,7 +3,7 @@
   <header class="mb-6">
     <img src="/images/OPX_logo_escuro.png" alt="Logomarca do sistema" class="max-w-full h-auto mx-auto">
     <h1 class="text-2xl font-bold">
-      Fevereiro 2026
+      {{currentMonth?.monthName}}
     </h1>
     <p class="text-sm text-neutral-400">
       Performance Semanal
@@ -50,10 +50,10 @@
   </section>
 
   <section>
-    <div *ngIf="bestWeekday">
+    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200" *ngIf="bestWeekday">
 
-      <h3>Melhor Dia da Semana</h3>
-      <p>{{ getWeekdayName(bestWeekday.weekday) }}</p>
+      <h3 class="text-sm text-gray-500">Melhor Dia da Semana</h3>
+      <p class="text-sm text-gray-500">{{ getWeekdayName(bestWeekday.weekday) }}</p>
 
     </div>
   </section>
