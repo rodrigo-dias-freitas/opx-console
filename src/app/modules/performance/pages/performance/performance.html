@@ -49,13 +49,10 @@
   
   </section>
 
-  <section>
-    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200" *ngIf="bestWeekday">
-
-      <h3 class="text-sm text-gray-500">Melhor Dia da Semana</h3>
-      <p class="text-sm text-gray-500">{{ getWeekdayName(bestWeekday.weekday) }}</p>
-
-    </div>
+  <section *ngIf="days.length > 0">
+    <app-best-weekday [days]="days"></app-best-weekday>
   </section>
+
+  
 
 </div>

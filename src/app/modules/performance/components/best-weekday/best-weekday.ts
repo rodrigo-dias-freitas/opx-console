@@ -1,10 +1,10 @@
+import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
 
-interface Day {
-  date: Date;
-  points: number;
-  result: number;
+interface WeekdayStats {
+  name: string;
+  totalResult: number;
+  tradeCount: number;
 }
 
 @Component({
@@ -12,66 +12,42 @@ interface Day {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './best-weekday.html',
-  styleUrl: './best-weekday.css',
+  styleUrls: ['./best-weekday.css']
 })
-export class BestWeekday {
+export class BestWeekdayComponent implements OnChanges {
+  @Input() days: any[] = []; // O array 'this.days' do seu loadCsv
+  
+  bestDay: WeekdayStats | null = null;
+  weekdays: WeekdayStats[] = [];
+  
+  private names = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
-  @Input() data!:{
-    weekday: number;
-    weekdayName: number;
-    average: number;
-  };
-
-  days: Day[] = [];
-
-  getWeekdayName(index: number): string {
-
-    const names = [
-      'Domingo',
-      'Segunda',
-      'Terça',
-      'Quarta',
-      'Quinta',
-      'Sexta',
-      'Sábado'
-    ];
-
-    return names[index];
+  ngOnChanges() {
+    if (this.days && this.days.length > 0) {
+      this.calculateBestDay();
+    }
   }
 
-  getBestWeekday() {
+  private calculateBestDay() {
+    const group = new Map<number, { res: number; count: number }>();
 
-    const map = new Map<number, { total: number; count: number }>();
-
-    this.days.forEach(day => {
-
-      const weekday = day.date.getDay();
-
-      if (!map.has(weekday)) {
-        map.set(weekday, { total: 0, count: 0 });
-      }
-
-      const current = map.get(weekday)!;
-      current.total += day.points;
-      current.count += 1;
+    this.days.forEach(d => {
+      const dayIdx = d.date.getDay();
+      const current = group.get(dayIdx) || { res: 0, count: 0 };
+      group.set(dayIdx, { 
+        res: current.res + d.result, 
+        count: current.count + 1 
+      });
     });
 
-    const averages = Array.from(map.entries()).map(([weekday, value]) => ({
-      weekday,
-      average: value.total / value.count
-    }));
+    this.weekdays = Array.from(group.entries())
+      .map(([idx, data]) => ({
+        name: this.names[idx],
+        totalResult: data.res,
+        tradeCount: data.count
+      }))
+      .sort((a, b) => b.totalResult - a.totalResult);
 
-    averages.sort((a, b) => b.average - a.average);
-
-    const best = averages[0];
-
-    if (!best) return undefined;
-
-    return {
-      ...best,
-      weekdayName: this.getWeekdayName(best.weekday)
-    };
+    this.bestDay = this.weekdays[0];
   }
-
-
 }

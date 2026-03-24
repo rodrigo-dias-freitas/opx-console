@@ -7,6 +7,7 @@ import { WeekHero } from '../../components/week-hero/week-hero';
 import { MonthSummary } from '../../components/month-summary/month-summary';
 import { Week } from '../../../../core/model/week';
 import { PerformanceService } from '../../services/performance.service';
+import { BestWeekdayComponent } from '../../components/best-weekday/best-weekday';
 
 interface MonthGroup {
   year: number;
@@ -24,7 +25,7 @@ interface Day {
 @Component({
   selector: 'app-performance',
   standalone: true,
-  imports: [ CommonModule, MonthSummary, WeekHero ],
+  imports: [CommonModule, MonthSummary, WeekHero, BestWeekdayComponent],
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })
