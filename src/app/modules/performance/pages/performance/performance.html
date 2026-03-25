@@ -1,57 +1,71 @@
-<div class="min-h-screen bg-[#004aad] text-white px-4 py-6">
+<div class="min-h-screen bg-[#004aad] text-white px-4 py-8 font-sans">
 
-  <header class="mb-6">
-    <img src="/images/OPX_logo_escuro.png" alt="Logomarca do sistema" class="max-w-full h-auto mx-auto">
-    <h1 class="text-2xl font-bold">
-      {{currentMonth?.monthName}}
-    </h1>
-    <p class="text-sm text-neutral-400">
-      Performance Semanal
-    </p>
-  </header>
-
-
-  <section  *ngIf="currentWeek as week">
-    <app-week-hero [week]="week"></app-week-hero>
-  </section>
-  <section class="mt-8">
-  <div *ngIf="currentMonth as month">
-
-    <div class="flex items-center justify-between mb-6">
-      <button
-        (click)="goToPreviousMonth()"
+  <header class="max-w-5xl mx-auto mb-10 text-center">
+    <img src="/images/OPX_logo_escuro.png" alt="OPX Console" class="h-12 mx-auto mb-4 object-contain">
+    <div class="inline-flex items-center gap-4 bg-black/20 px-4 py-2 rounded-full border border-white/10">
+      <button 
+        (click)="goToPreviousMonth()" 
         [disabled]="selectedMonthIndex === 0"
-        class="px-4 py-2 bg-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-700 transition-colors">
-        ←
+        class="hover:text-blue-400 disabled:opacity-30 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
       </button>
+      
+      <h1 class="text-lg font-black uppercase tracking-tighter min-w-[150px]">
+        {{ currentMonth?.monthName }}
+      </h1>
 
-      <div class="text-center">
-        <h2 class="text-xl font-black uppercase tracking-widest text-white">
-          {{ month.monthName }}
-        </h2>
-        <span class="text-[10px] text-blue-400 font-bold uppercase">Relatório de Performance</span>
-      </div>
-
-      <button
-        (click)="goToNextMonth()"
+      <button 
+        (click)="goToNextMonth()" 
         [disabled]="selectedMonthIndex === months.length - 1"
-        class="px-4 py-2 bg-gray-800 text-white rounded-lg disabled:opacity-30 hover:bg-gray-700 transition-colors">
-        →
+        class="hover:text-blue-400 disabled:opacity-30 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
       </button>
     </div>
+  </header>
 
-    <app-month-summary
-      [weeks]="month.weeks"
-      [monthName]="month.monthName"
-      [monthlyGoal]="8000">
-    </app-month-summary>
+  <main class="max-w-5xl mx-auto">
+    
+    <section *ngIf="currentWeek" class="mb-8">
+      <app-week-hero [week]="currentWeek"></app-week-hero>
+    </section>
 
-  </div>
-</section>
-  <section *ngIf="days.length > 0">
-    <app-best-weekday [days]="days"></app-best-weekday>
-  </section>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <section class="lg:col-span-2">
+        <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest mb-4 ml-2">Consolidado Mensal</h3>
+        <app-month-summary
+          *ngIf="currentMonth"
+          [weeks]="currentMonth.weeks"
+          [monthName]="currentMonth.monthName"
+          [monthlyGoal]="8000">
+        </app-month-summary>
+      </section>
 
-  
+      <section class="flex flex-col gap-6">
+        <h3 class="text-xs font-bold text-blue-300 uppercase tracking-widest mb-4 ml-2">Insights de Mercado</h3>
+        
+        <app-best-weekday [days]="days"></app-best-weekday>
+
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <span class="text-[10px] text-neutral-400 uppercase">Sistema</span>
+          <p class="text-sm font-medium mt-1">SFLIM v2.0 Ativo</p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-green-400">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            Monitorando Profit Pro CSV
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="max-w-5xl mx-auto mt-12 pt-6 border-t border-white/5 text-center">
+    <p class="text-[10px] text-white/30 uppercase tracking-[0.3em]">
+      Rodrigo Freitas • UI/UX Designer & Financial Analyst
+    </p>
+  </footer>
 
 </div>

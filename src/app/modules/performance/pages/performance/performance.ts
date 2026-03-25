@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
 
-import { WeekHero } from '../../components/week-hero/week-hero';
+import { WeekHeroComponent } from '../../components/week-hero/week-hero';
 import { MonthSummaryComponent } from '../../components/month-summary/month-summary';
 import { Week } from '../../../../core/model/week';
 import { PerformanceService } from '../../services/performance.service';
@@ -25,7 +25,7 @@ interface Day {
 @Component({
   selector: 'app-performance',
   standalone: true,
-  imports: [CommonModule, MonthSummaryComponent, WeekHero, BestWeekdayComponent],
+  imports: [CommonModule, MonthSummaryComponent, WeekHeroComponent, BestWeekdayComponent],
   templateUrl: './performance.html',
   styleUrl: './performance.css',
 })

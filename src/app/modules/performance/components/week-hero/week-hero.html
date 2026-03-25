@@ -1,54 +1,37 @@
-<div *ngIf="week"
-  class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 text-[#333333] mb-8">
-  <!-- Header -->
-  <div class="text-xs uppercase tracking-wider opacity-60">
-    Semana Atual
-  </div>
+<div class="relative overflow-hidden rounded-3xl p-8 mb-8 transition-all duration-500"
+     [ngClass]="isGain ? 'bg-gradient-to-br from-green-600/20 to-green-900/40 border border-green-500/30' : 
+                          'bg-gradient-to-br from-red-600/20 to-red-900/40 border border-red-500/30'">
+  
+  <div class="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20"
+       [ngClass]="isGain ? 'bg-green-400' : 'bg-red-400'"></div>
 
-  <div class="text-sm opacity-60 mt-1">
-    {{ week.weekStart }} – {{ week.weekEnd }}
-  </div>
-
-  <!-- Main KPI -->
-  <div class="mt-4">
-    <div class="text-4xl font-semibold leading-tight">
-      {{ week.points >= 0 ? '+' : '' }}{{ week.points }} pts
+  <div class="relative z-10 flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
+    
+    <div>
+      <span class="text-xs font-bold uppercase tracking-[0.2em] opacity-60">Status da Semana Atual</span>
+      <h2 class="text-5xl font-black mt-2 flex items-baseline gap-2">
+        {{ (week?.result ?? week?.totalResult) | currency:'BRL' }}
+        <span class="text-sm font-medium opacity-50" *ngIf="isGain">🚀</span>
+        <span class="text-sm font-medium opacity-50" *ngIf="!isGain">📉</span>
+      </h2>
+      <p class="text-sm mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10">
+        <span class="w-2 h-2 rounded-full" [ngClass]="isGain ? 'bg-green-400' : 'bg-red-400'"></span>
+        {{ week?.totalPoints ?? week?.points | number }} Pontos Acumulados
+      </p>
     </div>
 
-    <div class="text-lg mt-1 opacity-80">
-      R$ {{ week.result | number:'1.2-2':'pt-BR' }}
-    </div>
-  </div>
-
-  <!-- Progress Bar -->
-  <div class="mt-6">
-    <div class="flex justify-between text-xs mb-1 opacity-60">
-      <span>Meta: {{ week.goal }} pts</span>
-      <span>{{ progressPercent }}%</span>
-    </div>
-
-    <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-      <div
-        class="h-full transition-all duration-500"
-        [ngClass]="progressBarClass"
-        [style.width.%]="progressPercent"
-      ></div>
-    </div>
-  </div>
-
-  <!-- Status -->
-  <div class="mt-6 border-t border-gray-700 pt-4">
-    <div class="text-sm font-semibold tracking-wide">
-      STATUS: {{ statusLabel }}
+    <div class="flex gap-8 text-right">
+      <div *ngIf="winRate > 0">
+        <span class="block text-[10px] uppercase opacity-50 mb-1">Aproveitamento</span>
+        <span class="text-2xl font-bold">{{ winRate | number:'1.0-0' }}%</span>
+      </div>
+      <div>
+        <span class="block text-[10px] uppercase opacity-50 mb-1">Média p/ Dia</span>
+        <span class="text-2xl font-bold">
+          {{ ((week?.result ?? week?.totalResult) / 5) | currency:'BRL' }}
+        </span>
+      </div>
     </div>
 
-    <div class="text-xs mt-1 opacity-70">
-      Proteção:
-      <span
-        [ngClass]="week.protection ? 'text-green-500' : 'text-red-500'"
-      >
-        {{ week.protection ? 'ATIVA' : 'INATIVA' }}
-      </span>
-    </div>
   </div>
 </div>

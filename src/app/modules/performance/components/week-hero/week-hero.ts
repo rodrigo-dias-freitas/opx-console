@@ -1,49 +1,31 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { Week } from '../../../../core/model/week';
 
 @Component({
   selector: 'app-week-hero',
   standalone: true,
-  imports: [CommonModule],
+  imports: [ CommonModule ],
   templateUrl: './week-hero.html',
-  styleUrl: './week-hero.css',
+  styleUrls: ['./week-hero.css']
 })
-export class WeekHero {
+export class WeekHeroComponent implements OnChanges {
+  // Recebe a 'currentWeek' do seu dashboard principal
+  @Input() week: any; 
 
-@Input() week?: Week;
+  isGain: boolean = false;
+  winRate: number = 0;
 
-get progressPercent(): number {
-  if (!this.week?.goal) return 0;
-
-  return Math.min(
-    Math.max((this.week.points / this.week.goal) * 100, 0),
-    100
-  );
-}
-get progressBarClass(): string {
-  if (this.progressPercent >= 100)
-    return 'bg-green-500';
-
-  if (this.progressPercent >= 50)
-    return 'bg-blue-500';
-
-  return 'bg-red-500';
-}
-
-get statusLabel(): string {
-
-  if (!this.week) return '';
-
-  if (this.week.points >= this.week.goal)
-    return 'META ATINGIDA';
-
-  if (this.week.points > 0)
-    return 'EM CONSTRUÇÃO';
-
-  return 'NEGATIVO';
-}
-
-
+  ngOnChanges() {
+    if (this.week) {
+      // Ajuste os nomes das propriedades conforme o seu objeto Week
+      const result = this.week.result ?? this.week.totalResult ?? 0;
+      this.isGain = result >= 0;
+      
+      // Cálculo simples de aproveitamento se você tiver o número de trades
+      if (this.week.trades) {
+        const positives = this.week.trades.filter((t: any) => t.result > 0).length;
+        this.winRate = (positives / this.week.trades.length) * 100;
+      }
+    }
+  }
 }
